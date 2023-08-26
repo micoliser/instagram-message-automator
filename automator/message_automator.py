@@ -16,11 +16,10 @@ class MessageAutomator:
         self.password = password
 
         chrome_options = Options()
-        chrome_options.add_experimental_option("detach", True)
+        chrome_options.add_argument("--headless")
 
         self.__driver = webdriver.Chrome(options=chrome_options)
         self.__driver.implicitly_wait(20)
-        self.__driver.maximize_window()
 
     def login(self):
         """ Logs into Instagram """
