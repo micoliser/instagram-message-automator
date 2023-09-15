@@ -4,6 +4,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from datetime import datetime
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 class MessageAutomator:
@@ -16,7 +17,9 @@ class MessageAutomator:
         self.password = password
 
         chrome_options = Options()
-        chrome_options.add_argument("--headless")
+        #chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_experimental_option("detach", True)
 
         self.__driver = webdriver.Chrome(options=chrome_options)
         self.__driver.implicitly_wait(20)
@@ -46,12 +49,8 @@ class MessageAutomator:
         self.__driver.get(f"https://www.instagram.com/{user}/")
         print("Sending message to {}...".format(user))
 
-        try:
-            xpath_expr = "//div[@role='button' and text()='Message']"
-            self.__driver.find_element(By.XPATH, xpath_expr).click()
-        except Exception:
-            print("Message button not found. You are probably not following this user.")
-            return
+        xpath_expr = "//div[@role='button' and text()='Message']"
+        self.__driver.find_element(By.XPATH, xpath_expr).click()
 
         try:
             self.__driver.find_element(By.CSS_SELECTOR, "._a9_1").click()
@@ -60,5 +59,10 @@ class MessageAutomator:
         
         message_box = self.__driver.find_element(By.XPATH, "//div[@contenteditable='true']")
         message_box.send_keys(message)
-        message_box.send_keys(Keys.RETURN)
+        self.__driver.find_element(By.XPATH, "//div[@role='button' and text()='Send']").click()
         print("Message sent to {} at {}".format(user, datetime.now().strftime("%H:%M:%S")))
+
+    def close(self):
+        """ Closes the browser window """
+
+        self.__driver.close()
